@@ -1,4 +1,4 @@
-const setSuggestionsForNumberInput = (e: string, r: SuggestionResults, t?: string[]) => {
+const validateInput = (e: string, r: SuggestionResults, t?: string[]) => {
 	if ('' === e) r.setSuggestions(t);
 	else if (Number.isFinite(Number(e)))
 		if (Number(e) <= 0) r.setError('Select at least one element.');
@@ -16,12 +16,12 @@ figma.parameters.on('input', ({ query, key, result }: ParameterInputEvent) => {
 	switch (key) {
 		case 'columns':
 			const columnSize = ['2', '4', '6', '8', '12', '14', '16'];
-			setSuggestionsForNumberInput(query, result, columnSize);
+			validateInput(query, result, columnSize);
 			break;
 
 		case 'gap':
 			const gapSize = ['4', '6', '8', '12', '14', '16'];
-			setSuggestionsForNumberInput(query, result, gapSize);
+			validateInput(query, result, gapSize);
 			break;
 		default:
 			return;
