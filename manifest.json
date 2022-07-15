@@ -1,0 +1,20 @@
+{
+	"name": "Griddle",
+	"id": "1129518088088100039",
+	"api": "1.0.0",
+	"main": "code.js",
+	"editorType": ["figma"],
+	"parameterOnly": true,
+	"parameters": [
+		{
+			"name": "Columns",
+			"key": "columns",
+			"description": "How many columns would you like in your grid?"
+		},
+		{
+			"name": "Gap",
+			"key": "gap",
+			"description": "How large (in pixels) would you like the gap between items to be?"
+		}
+	]
+}
