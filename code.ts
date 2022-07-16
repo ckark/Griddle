@@ -9,54 +9,48 @@ const validateInput = (e: string, r: SuggestionResults, t?: string[]) => {
 	else r.setError('Enter a numeric value.');
 };
 figma.parameters.on('input', ({ query, key, result }: ParameterInputEvent) => {
-	if (figma.currentPage.selection.length === 0) {
-		result.setError('Select at least one element.');
-		return;
-	}
+	0 === figma.currentPage.selection.length && result.setError('Select at least one element.');
 	switch (key) {
 		case 'columns':
-			const columnSize = ['2', '4', '6', '8', '12', '14', '16'];
-			validateInput(query, result, columnSize);
+			validateInput(query, result, ['2', '4', '6', '8', '12', '14', '16']);
 			break;
-
 		case 'gap':
-			const gapSize = ['4', '6', '8', '12', '14', '16'];
-			validateInput(query, result, gapSize);
+			validateInput(query, result, ['4', '6', '8', '12', '14', '16']);
 			break;
 		default:
 			return;
 	}
 });
 figma.on('run', ({ parameters }: RunEvent) => {
-	const split = (r, n) => {
-		let a = [],
-			p = [];
-		for (r = [...figma.currentPage.selection].sort((a, e) => a.name.localeCompare(e.name)); r.length; )
-			a.push(r.splice(0, n));
-		let o = figma.currentPage.selection.map((a) => a.parent);
-		a.forEach((e) => {
-			let r = figma.createFrame();
-			(r.layoutMode = 'HORIZONTAL'),
-				(r.counterAxisSizingMode = 'AUTO'),
-				(r.name = 'Row'),
-				(r.clipsContent = !1),
-				(r.itemSpacing = parseInt(parameters.gap)),
-				(r.backgrounds = []),
-				e.forEach((i) => {
-					r.appendChild(i), p.push(i.parent as FrameNode[]);
+	const split = (e, a) => {
+		let t = [],
+			n = [];
+		for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; )
+			t.push(e.splice(0, a));
+		let r = figma.currentPage.selection.map((e) => e.parent);
+		t.forEach((e) => {
+			let a = figma.createFrame();
+			(a.layoutMode = 'HORIZONTAL'),
+				(a.counterAxisSizingMode = 'AUTO'),
+				(a.name = 'Row'),
+				(a.clipsContent = !1),
+				(a.itemSpacing = parseInt(parameters.gap)),
+				(a.backgrounds = []),
+				e.forEach((e) => {
+					a.appendChild(e), n.push(e.parent as FrameNode[]);
 				});
 		});
-		let g = figma.createFrame();
-		(g.layoutMode = 'VERTICAL'),
-			(g.counterAxisSizingMode = 'AUTO'),
-			(g.name = 'Grid'),
-			(g.clipsContent = !1),
-			(g.itemSpacing = parseInt(parameters.gap)),
-			(g.backgrounds = []),
-			p.forEach((r) => {
-				g.appendChild(r), (g = r.parent);
+		let p = figma.createFrame();
+		(p.layoutMode = 'VERTICAL'),
+			(p.counterAxisSizingMode = 'AUTO'),
+			(p.name = 'Grid'),
+			(p.clipsContent = !1),
+			(p.itemSpacing = parseInt(parameters.gap)),
+			(p.backgrounds = []),
+			n.forEach((a) => {
+				p.appendChild(a), (p = a.parent);
 			}),
-			o.forEach((e) => e.appendChild(g));
+			r.forEach((a) => a.appendChild(p));
 	};
 	split(figma.currentPage.selection, parseInt(parameters.columns));
 	figma.closePlugin('Selection griddled. 🧇');
