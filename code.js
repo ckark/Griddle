@@ -1,7 +1,7 @@
 const validateInput = (e, a, t) => {
 	if ('' === e) a.setSuggestions(t);
-	else if (Number.isFinite(Number(e)))
-		if (Number(e) <= 0) a.setError('Select at least one element.');
+	else if (Number.isFinite(+e))
+		if (+e <= 0) a.setError('Select at least one element.');
 		else {
 			const n = t ? t.filter((a) => a.includes(e) && a !== e) : [];
 			a.setSuggestions([e, ...n]);
@@ -21,35 +21,47 @@ figma.parameters.on('input', ({ query: e, key: a, result: t }) => {
 	}
 }),
 	figma.on('run', ({ parameters: e }) => {
-		((a, t) => {
-			let n = [],
-				r = [];
-			for (a = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); a.length; )
-				n.push(a.splice(0, t));
-			let i = figma.currentPage.selection.map((e) => e.parent);
-			n.forEach((a) => {
-				let t = figma.createFrame();
-				(t.layoutMode = 'HORIZONTAL'),
-					(t.counterAxisSizingMode = 'AUTO'),
-					(t.name = 'Row'),
-					(t.clipsContent = !1),
-					(t.itemSpacing = parseInt(e.gap)),
-					(t.backgrounds = []),
-					a.forEach((e) => {
-						t.appendChild(e), r.push(e.parent);
-					});
-			});
-			let s = figma.createFrame();
-			(s.layoutMode = 'VERTICAL'),
-				(s.counterAxisSizingMode = 'AUTO'),
-				(s.name = 'Grid'),
-				(s.clipsContent = !1),
-				(s.itemSpacing = parseInt(e.gap)),
-				(s.backgrounds = []),
-				r.forEach((e) => {
-					s.appendChild(e), (s = e.parent);
-				}),
-				i.forEach((e) => e.appendChild(s));
-		})(figma.currentPage.selection, parseInt(e.columns)),
-			figma.closePlugin('Selection griddled. 🧇');
+		figma.currentPage.selection.filter((a) => {
+			switch (a.parent.type) {
+				case 'COMPONENT_SET':
+					figma.closePlugin("You can't griddle variants of a component.");
+					break;
+				default:
+					((a, t) => {
+						let n = [],
+							r = [];
+						for (
+							a = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name));
+							a.length;
+
+						)
+							n.push(a.splice(0, t));
+						let i = figma.currentPage.selection.map((e) => e.parent);
+						n.map((a) => {
+							let t = figma.createFrame();
+							(t.layoutMode = 'HORIZONTAL'),
+								(t.counterAxisSizingMode = 'AUTO'),
+								(t.name = 'Row'),
+								(t.clipsContent = !1),
+								(t.itemSpacing = parseInt(e.gap)),
+								(t.backgrounds = []),
+								a.map((e) => {
+									t.appendChild(e), r.push(e.parent);
+								});
+						});
+						let l = figma.createFrame();
+						(l.layoutMode = 'VERTICAL'),
+							(l.counterAxisSizingMode = 'AUTO'),
+							(l.name = 'Grid'),
+							(l.clipsContent = !1),
+							(l.itemSpacing = parseInt(e.gap)),
+							(l.backgrounds = []),
+							r.map((e) => {
+								l.appendChild(e), (l = e.parent);
+							}),
+							i.map((e) => e.appendChild(l));
+					})(figma.currentPage.selection, parseInt(e.columns)),
+						figma.closePlugin('Selection griddled. 🧇');
+			}
+		});
 	});
