@@ -1,15 +1,14 @@
 const validateInput = (e: string, r: SuggestionResults, t?: string[]) => {
 	if ('' === e) r.setSuggestions(t);
 	else if (Number.isFinite(+e))
-		if (+e <= 0) r.setError('Select at least one element.');
+		if (+e <= 0) r.setError('Please select at least one element.');
 		else {
-			const s = t ? t.filter((t) => t.includes(e) && t !== e) : [];
+			const s = t ? t.filter((s) => s.includes(e) && s !== e) : [];
 			r.setSuggestions([e, ...s]);
 		}
 	else r.setError('Enter a numeric value.');
 };
 figma.parameters.on('input', ({ query, key, result }: ParameterInputEvent) => {
-	0 === figma.currentPage.selection.length && result.setError('Select at least one element.');
 	switch (key) {
 		case 'columns':
 			validateInput(query, result, ['2', '4', '6', '8', '12', '14', '16']);
@@ -22,6 +21,7 @@ figma.parameters.on('input', ({ query, key, result }: ParameterInputEvent) => {
 	}
 });
 figma.on('run', ({ parameters }: RunEvent) => {
+	0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.');
 	const split = (e, a) => {
 		let t = [],
 			n = [];
@@ -52,14 +52,5 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			}),
 			r.map((a) => a.appendChild(p));
 	};
-	figma.currentPage.selection.filter((e) => {
-		switch (e.parent.type) {
-			case 'COMPONENT_SET':
-				figma.closePlugin("You can't griddle variants of a component.");
-				break;
-			default:
-				split(figma.currentPage.selection, parseInt(parameters.columns)),
-					figma.closePlugin('Selection griddled. 🧇');
-		}
-	});
+	split(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇');
 });
