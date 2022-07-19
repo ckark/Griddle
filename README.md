@@ -10,7 +10,7 @@ With griddle, you can organize any number of selected elements into a grid:
 # Notes
 
 -   Don't feel constrained by the suggestions; feel free to specify any number of columns and any gap size you want. Just make sure both values are a number.
--   Nodes are sorted numerically and alphabetically prior to making the grid.
+-   Nodes are sorted numerically and alphabetically prior to making the grid. Since the plugin uses JavaScript's native `sort()` and `localeCompare()` methods, behavior may not always be predictible.
 
 # Roadmap
 
