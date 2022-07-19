@@ -36,9 +36,10 @@ figma.on('run', ({ parameters }: RunEvent) => {
 				(a.clipsContent = !1),
 				(a.itemSpacing = parseInt(parameters.gap)),
 				(a.backgrounds = []),
-				e.map((e) => {
-					a.appendChild(e), n.push(e.parent as FrameNode[]);
-				});
+				(a.itemReverseZIndex = true);
+			e.map((e) => {
+				a.appendChild(e), n.push(e.parent as FrameNode[]);
+			});
 		});
 		let p = figma.createFrame();
 		(p.layoutMode = 'VERTICAL'),
