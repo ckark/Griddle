@@ -25,8 +25,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 	const split = (e, a) => {
 		let t = [],
 			n = [];
-		for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; )
-			t.push(e.splice(0, a));
+		for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
 		let r = figma.currentPage.selection.map((e) => e.parent);
 		t.map((e) => {
 			let a = figma.createFrame();
@@ -53,5 +52,26 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			}),
 			r.map((a) => a.appendChild(p));
 	};
-	split(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇');
+	const singleRow = (e, a) => {
+		let t = [],
+			n = [];
+		for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
+		let r = figma.currentPage.selection.map((e) => e.parent);
+		t.map((e) => {
+			let a = figma.createFrame();
+			(a.layoutMode = 'HORIZONTAL'),
+				(a.counterAxisSizingMode = 'AUTO'),
+				(a.name = 'Row'),
+				(a.clipsContent = !1),
+				(a.itemSpacing = parseInt(parameters.gap)),
+				(a.backgrounds = []),
+				(a.itemReverseZIndex = true);
+			e.map((e) => {
+				a.appendChild(e), n.push(e.parent as FrameNode[]);
+			});
+		});
+	};
+	'1' === parameters.columns
+		? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
+		: (split(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
 });
