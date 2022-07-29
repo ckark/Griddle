@@ -21,57 +21,49 @@ figma.parameters.on('input', ({ query, key, result }: ParameterInputEvent) => {
 	}
 });
 figma.on('run', ({ parameters }: RunEvent) => {
+	const format = (e) => {
+		(e.counterAxisSizingMode = 'AUTO'), (e.clipsContent = !1), (e.itemSpacing = parseInt(parameters.gap)), (e.backgrounds = []), (e.itemReverseZIndex = !0);
+	};
 	0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.');
-	const split = (e, a) => {
-		let t = [],
-			n = [];
-		for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
-		let r = figma.currentPage.selection.map((e) => e.parent);
-		t.map((e) => {
-			let a = figma.createFrame();
-			(a.layoutMode = 'HORIZONTAL'),
-				(a.counterAxisSizingMode = 'AUTO'),
-				(a.name = 'Row'),
-				(a.clipsContent = !1),
-				(a.itemSpacing = parseInt(parameters.gap)),
-				(a.backgrounds = []),
-				(a.itemReverseZIndex = true);
-			e.map((e) => {
-				a.appendChild(e), n.push(e.parent as FrameNode[]);
+	const grid = (e, a) => {
+			let t = [],
+				n = [];
+			for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
+			let r = figma.currentPage.selection.map((e) => e.parent);
+			t.map((e) => {
+				let a = figma.createFrame();
+				(a.layoutMode = 'HORIZONTAL'),
+					(a.name = 'Row'),
+					format(a),
+					e.map((e) => {
+						a.appendChild(e), n.push(e.parent as FrameNode[]);
+					});
 			});
-		});
-		let p = figma.createFrame();
-		(p.layoutMode = 'VERTICAL'),
-			(p.counterAxisSizingMode = 'AUTO'),
-			(p.name = 'Grid'),
-			(p.clipsContent = !1),
-			(p.itemSpacing = parseInt(parameters.gap)),
-			(p.backgrounds = []),
-			n.map((a) => {
-				p.appendChild(a), (p = a.parent);
-			}),
-			r.map((a) => a.appendChild(p));
-	};
-	const singleRow = (e, a) => {
-		let t = [],
-			n = [];
-		for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
-		let r = figma.currentPage.selection.map((e) => e.parent);
-		t.map((e) => {
-			let a = figma.createFrame();
-			(a.layoutMode = 'HORIZONTAL'),
-				(a.counterAxisSizingMode = 'AUTO'),
-				(a.name = 'Row'),
-				(a.clipsContent = !1),
-				(a.itemSpacing = parseInt(parameters.gap)),
-				(a.backgrounds = []),
-				(a.itemReverseZIndex = true);
-			e.map((e) => {
-				a.appendChild(e), n.push(e.parent as FrameNode[]);
+			let l = figma.createFrame();
+			(l.layoutMode = 'VERTICAL'),
+				(l.name = 'Grid'),
+				format(l),
+				n.map((e) => {
+					l.appendChild(e), (l = e.parent);
+				}),
+				r.map((e) => e.appendChild(l));
+		},
+		singleRow = (e, a) => {
+			let t = [],
+				n = [];
+			for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
+			figma.currentPage.selection.map((e) => e.parent);
+			t.map((e) => {
+				let a = figma.createFrame();
+				(a.layoutMode = 'HORIZONTAL'),
+					(a.name = 'Row'),
+					format(a),
+					e.map((e) => {
+						a.appendChild(e), n.push(e.parent as FrameNode[]);
+					});
 			});
-		});
-	};
+		};
 	'1' === parameters.columns
 		? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
-		: (split(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
+		: (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
 });
