@@ -11,10 +11,13 @@ const validateInput = (e: string, r: SuggestionResults, t?: string[]) => {
 figma.parameters.on('input', ({ query, key, result }: ParameterInputEvent) => {
 	switch (key) {
 		case 'columns':
-			validateInput(query, result, ['2', '4', '6', '8', '12', '14', '16']);
+			validateInput(query, result, ['1', '2', '4', '6', '8', '12', '14', '16']);
 			break;
 		case 'gap':
 			validateInput(query, result, ['4', '6', '8', '12', '14', '16']);
+			break;
+		case 'sort':
+			validateInput(query, result, ['No', 'Yes']);
 			break;
 		default:
 			return;
@@ -28,7 +31,8 @@ figma.on('run', ({ parameters }: RunEvent) => {
 	const grid = (e, a) => {
 			let t = [],
 				n = [];
-			for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
+			if ('Yes' === parameters.sort) for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
+			else for (e = [...figma.currentPage.selection]; e.length; ) t.push(e.splice(0, a));
 			let r = figma.currentPage.selection.map((e) => e.parent);
 			t.map((e) => {
 				let a = figma.createFrame();
@@ -51,7 +55,8 @@ figma.on('run', ({ parameters }: RunEvent) => {
 		singleRow = (e, a) => {
 			let t = [],
 				n = [];
-			for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
+			if ('Yes' === parameters.sort) for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
+			else for (e = [...figma.currentPage.selection]; e.length; ) t.push(e.splice(0, a));
 			figma.currentPage.selection.map((e) => e.parent);
 			t.map((e) => {
 				let a = figma.createFrame();

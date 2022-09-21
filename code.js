@@ -1,69 +1,82 @@
 const validateInput = (e, r, t) => {
-	if ('' === e) r.setSuggestions(t);
-	else if (Number.isFinite(+e))
-		if (+e <= 0) r.setError('Please select at least one element.');
-		else {
-			const s = t ? t.filter((s) => s.includes(e) && s !== e) : [];
-			r.setSuggestions([e, ...s]);
-		}
-	else r.setError('Enter a numeric value.');
+    if ('' === e)
+        r.setSuggestions(t);
+    else if (Number.isFinite(+e))
+        if (+e <= 0)
+            r.setError('Please select at least one element.');
+        else {
+            const s = t ? t.filter((s) => s.includes(e) && s !== e) : [];
+            r.setSuggestions([e, ...s]);
+        }
+    else
+        r.setError('Enter a numeric value.');
 };
 figma.parameters.on('input', ({ query, key, result }) => {
-	switch (key) {
-		case 'columns':
-			validateInput(query, result, ['2', '4', '6', '8', '12', '14', '16']);
-			break;
-		case 'gap':
-			validateInput(query, result, ['4', '6', '8', '12', '14', '16']);
-			break;
-		default:
-			return;
-	}
+    switch (key) {
+        case 'columns':
+            validateInput(query, result, ['1', '2', '4', '6', '8', '12', '14', '16']);
+            break;
+        case 'gap':
+            validateInput(query, result, ['4', '6', '8', '12', '14', '16']);
+            break;
+        case 'sort':
+            validateInput(query, result, ['No', 'Yes']);
+            break;
+        default:
+            return;
+    }
 });
 figma.on('run', ({ parameters }) => {
-	const format = (e) => {
-		(e.counterAxisSizingMode = 'AUTO'), (e.clipsContent = !1), (e.itemSpacing = parseInt(parameters.gap)), (e.backgrounds = []), (e.itemReverseZIndex = !0);
-	};
-	0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.');
-	const grid = (e, a) => {
-			let t = [],
-				n = [];
-			for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
-			let r = figma.currentPage.selection.map((e) => e.parent);
-			t.map((e) => {
-				let a = figma.createFrame();
-				(a.layoutMode = 'HORIZONTAL'),
-					(a.name = 'Row'),
-					format(a),
-					e.map((e) => {
-						a.appendChild(e), n.push(e.parent);
-					});
-			});
-			let l = figma.createFrame();
-			(l.layoutMode = 'VERTICAL'),
-				(l.name = 'Grid'),
-				format(l),
-				n.map((e) => {
-					l.appendChild(e), (l = e.parent);
-				}),
-				r.map((e) => e.appendChild(l));
-		},
-		singleRow = (e, a) => {
-			let t = [],
-				n = [];
-			for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length; ) t.push(e.splice(0, a));
-			figma.currentPage.selection.map((e) => e.parent);
-			t.map((e) => {
-				let a = figma.createFrame();
-				(a.layoutMode = 'HORIZONTAL'),
-					(a.name = 'Row'),
-					format(a),
-					e.map((e) => {
-						a.appendChild(e), n.push(e.parent);
-					});
-			});
-		};
-	'1' === parameters.columns
-		? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
-		: (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
+    const format = (e) => {
+        (e.counterAxisSizingMode = 'AUTO'), (e.clipsContent = !1), (e.itemSpacing = parseInt(parameters.gap)), (e.backgrounds = []), (e.itemReverseZIndex = !0);
+    };
+    0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.');
+    const grid = (e, a) => {
+        let t = [], n = [];
+        if ('Yes' === parameters.sort)
+            for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length;)
+                t.push(e.splice(0, a));
+        else
+            for (e = [...figma.currentPage.selection]; e.length;)
+                t.push(e.splice(0, a));
+        let r = figma.currentPage.selection.map((e) => e.parent);
+        t.map((e) => {
+            let a = figma.createFrame();
+            (a.layoutMode = 'HORIZONTAL'),
+                (a.name = 'Row'),
+                format(a),
+                e.map((e) => {
+                    a.appendChild(e), n.push(e.parent);
+                });
+        });
+        let l = figma.createFrame();
+        (l.layoutMode = 'VERTICAL'),
+            (l.name = 'Grid'),
+            format(l),
+            n.map((e) => {
+                l.appendChild(e), (l = e.parent);
+            }),
+            r.map((e) => e.appendChild(l));
+    }, singleRow = (e, a) => {
+        let t = [], n = [];
+        if ('Yes' === parameters.sort)
+            for (e = [...figma.currentPage.selection].sort((e, a) => e.name.localeCompare(a.name)); e.length;)
+                t.push(e.splice(0, a));
+        else
+            for (e = [...figma.currentPage.selection]; e.length;)
+                t.push(e.splice(0, a));
+        figma.currentPage.selection.map((e) => e.parent);
+        t.map((e) => {
+            let a = figma.createFrame();
+            (a.layoutMode = 'HORIZONTAL'),
+                (a.name = 'Row'),
+                format(a),
+                e.map((e) => {
+                    a.appendChild(e), n.push(e.parent);
+                });
+        });
+    };
+    '1' === parameters.columns
+        ? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
+        : (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
 });

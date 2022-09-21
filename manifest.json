@@ -15,6 +15,11 @@
 			"name": "Gap",
 			"key": "gap",
 			"description": "How large (in pixels) would you like the gap between items to be?"
+		},
+		{
+			"name": "Sort",
+			"key": "sort",
+			"description": "Would you like your grid items sorted?"
 		}
 	]
 }
