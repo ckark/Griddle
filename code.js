@@ -56,20 +56,20 @@ figma.on('run', ({ parameters }) => {
             n.map((e) => {
                 l.appendChild(e), (l = e.parent);
             }),
-            r.map((e) => e.appendChild(l)),
-            (l.layoutMode = 'NONE');
-        const itemYPos = [], itemXPos = [];
-        t.flat().map((e) => {
-            itemYPos.push(e.absoluteTransform[1][2]), itemXPos.push(e.absoluteTransform[0][2]);
+            r.map((e) => e.appendChild(l));
+        let rows = [], items = figma.currentPage.selection;
+        items.map((e) => {
+            rows.push(e.parent);
         });
-        let items = figma.currentPage.selection;
         items.map((e) => figma.currentPage.appendChild(e));
+        const columnsX = [], rowsY = [];
+        rows.map((e) => rowsY.push(e.y)), items.map((e) => columnsX.push(e.x));
         for (let e = 0; e < items.length; e++)
-            for (let t = 0; t < itemXPos.length; t++)
-                (items[e].x = itemXPos[t] + origX), e++;
+            for (let t = 0; t < columnsX.length; t++)
+                (items[e].x = columnsX[t] + origX), e++;
         for (let e = 0; e < items.length; e++)
-            for (let t = 0; t < itemYPos.length; t++)
-                (items[e].y = itemYPos[t] + origY), e++;
+            for (let t = 0; t < rowsY.length; t++)
+                (items[e].y = rowsY[t] + origY), e++;
         l.remove();
     }, singleRow = (e, t) => {
         let a = figma.createFrame();
