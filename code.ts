@@ -56,15 +56,12 @@ figma.on('run', ({ parameters }: RunEvent) => {
 				r.map((e) => e.appendChild(l));
 			let rows = [],
 				items = figma.currentPage.selection;
-			items.map((e) => {
-				rows.push(e.parent);
-			});
-			items.map((e) => figma.currentPage.appendChild(e));
+			items.map((e) => rows.push(e.parent)), items.map((e) => figma.currentPage.appendChild(e));
 			const columnsX = [],
 				rowsY = [];
 			rows.map((e) => rowsY.push(e.y)), items.map((e) => columnsX.push(e.x));
-			for (let e = 0; e < items.length; e++) for (let t = 0; t < columnsX.length; t++) (items[e].x = columnsX[t] + origX), e++;
-			for (let e = 0; e < items.length; e++) for (let t = 0; t < rowsY.length; t++) (items[e].y = rowsY[t] + origY), e++;
+			for (let e = 0; e < items.length; e++) for (let l = 0; l < columnsX.length; l++) (items[e].x = columnsX[l] + origX), e++;
+			for (let e = 0; e < items.length; e++) for (let l = 0; l < rowsY.length; l++) (items[e].y = rowsY[l] + origY), e++;
 			l.remove();
 		},
 		singleRow = (e, t) => {
