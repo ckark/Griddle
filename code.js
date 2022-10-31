@@ -108,7 +108,11 @@ figma.on('run', ({ parameters }) => {
             })(),
             a.remove();
     };
-    '1' === parameters.columns
-        ? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
-        : (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
+    figma.currentPage.selection.map((e) => {
+        'COMPONENT_SET' === e.parent.type
+            ? figma.closePlugin("You can't rearrange elements in component sets.")
+            : 1 === parameters.columns
+                ? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
+                : (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
+    });
 });
