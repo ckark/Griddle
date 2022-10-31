@@ -28,24 +28,24 @@ figma.parameters.on('input', ({ query, key, result }) => {
 });
 figma.on('run', ({ parameters }) => {
     0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.');
-    const origX = figma.currentPage.selection.map((e) => e.x).reduce((a, b) => Math.min(a, b)), origY = figma.currentPage.selection.map((e) => e.y).reduce((a, b) => Math.min(a, b)), format = (e) => {
+    const origX = figma.currentPage.selection.map((e) => e.x).reduce((e, t) => Math.min(e, t)), origY = figma.currentPage.selection.map((e) => e.y).reduce((e, t) => Math.min(e, t)), format = (e) => {
         (e.counterAxisSizingMode = 'AUTO'), (e.clipsContent = !1), (e.itemSpacing = parseInt(parameters.gap)), (e.backgrounds = []), (e.itemReverseZIndex = !0);
-    }, grid = (e, a) => {
-        let t = [], n = [];
+    }, grid = (e, t) => {
+        let a = [], r = [...figma.currentPage.selection].sort((e, t) => e.x - t.x).sort((e, t) => e.y - t.y);
         if ('Yes' === parameters.sort)
-            for (e = [...figma.currentPage.selection].sort((e, t) => e.name.localeCompare(t.name)); e.length;)
-                t.push(e.splice(0, a));
+            for (e = r.sort((e, t) => e.name.localeCompare(t.name)); e.length;)
+                a.push(e.splice(0, t));
         else
-            for (e = [...figma.currentPage.selection]; e.length;)
-                t.push(e.splice(0, a));
-        let r = figma.currentPage.selection.map((e) => e.parent);
-        t.map((e) => {
+            for (e = r; e.length;)
+                a.push(e.splice(0, t));
+        let n = figma.currentPage.selection.map((e) => e.parent);
+        a.map((e) => {
             let t = figma.createFrame();
             (t.layoutMode = 'HORIZONTAL'),
                 (t.name = 'Row'),
                 format(t),
                 e.map((e) => {
-                    t.appendChild(e), n.push(e.parent);
+                    t.appendChild(e), r.push(e.parent);
                 }),
                 (t.layoutMode = 'NONE');
         });
@@ -53,57 +53,58 @@ figma.on('run', ({ parameters }) => {
         (l.layoutMode = 'VERTICAL'),
             (l.name = 'Grid'),
             format(l),
-            n.map((e) => {
-                l.appendChild(e), (l = e.parent);
+            r.map((e) => {
+                l.appendChild(e);
             }),
-            r.map((e) => e.appendChild(l));
-        let rows = [], items = figma.currentPage.selection;
-        items.map((e) => {
-            rows.push(e.parent);
-        });
-        items.map((e) => figma.currentPage.appendChild(e));
-        const columnsX = [], rowsY = [];
-        rows.map((e) => rowsY.push(e.y)), items.map((e) => columnsX.push(e.x));
-        for (let e = 0; e < items.length; e++)
-            for (let t = 0; t < columnsX.length; t++)
-                (items[e].x = columnsX[t] + origX), e++;
-        for (let e = 0; e < items.length; e++)
-            for (let t = 0; t < rowsY.length; t++)
-                (items[e].y = rowsY[t] + origY), e++;
+            n.map((e) => e.appendChild(l));
+        let o = [];
+        const i = [...figma.currentPage.selection];
+        i.map((e) => o.push(e.parent)), i.map((e) => figma.currentPage.appendChild(e));
+        const g = [], s = [];
+        o.map((e) => s.push(e.y)), i.map((e) => g.push(e.x));
+        for (let e = 0; e < i.length; e++)
+            for (let t = 0; t < g.length; t++)
+                (i[e].x = g[t] + origX), e++;
+        for (let e = 0; e < i.length; e++)
+            for (let t = 0; t < s.length; t++)
+                (i[e].y = s[t] + origY), e++;
         l.remove();
     }, singleRow = (e, t) => {
         let a = figma.createFrame();
-        const r = figma.currentPage.selection, l = r.filter((e) => e.parent), n = [], o = [], g = l[0].x, p = l[0].y;
+        const r = figma.currentPage.selection, n = r.filter((e) => e.parent), l = [], o = [], i = n[0].x, g = n[0].y;
         ((e, t) => {
-            let r = [], l = [];
+            let r = [], n = [];
             if ('Yes' === parameters.sort)
-                for (e = [...figma.currentPage.selection].sort((e, t) => e.name.localeCompare(t.name)); e.length;)
+                for (e = [...figma.currentPage.selection]
+                    .sort((e, t) => e.x - t.x)
+                    .sort((e, t) => e.y - t.y)
+                    .sort((e, t) => e.name.localeCompare(t.name)); e.length;)
                     r.push(e.splice(0, t));
             else
-                for (e = [...figma.currentPage.selection]; e.length;)
+                for (e = [...figma.currentPage.selection].sort((e, t) => e.x - t.x).sort((e, t) => e.y - t.y); e.length;)
                     r.push(e.splice(0, t));
             figma.currentPage.selection.map((e) => e.parent),
                 r.map((e) => {
                     (a.layoutMode = 'HORIZONTAL'),
                         format(a),
                         e.map((e) => {
-                            a.appendChild(e), l.push(e.parent);
+                            a.appendChild(e), n.push(e.parent);
                         });
                 });
         })(e, t),
             r.forEach((e) => {
-                n.push(e.x), o.push(e.y);
+                l.push(e.x), o.push(e.y);
             }),
             r.map((e) => {
                 figma.currentPage.appendChild(e);
             }),
             (() => {
-                for (let e = 0; e < n.length; e++)
+                for (let e = 0; e < l.length; e++)
                     for (let t = 0; t < r.length; t++)
-                        (r[t].x = n[e] + g), e++;
+                        (r[t].x = l[e] + i), e++;
                 for (let e = 0; e < o.length; e++)
                     for (let t = 0; t < r.length; t++)
-                        (r[t].y = o[e] + p), e++;
+                        (r[t].y = o[e] + g), e++;
             })(),
             a.remove();
     };
