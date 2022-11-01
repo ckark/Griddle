@@ -24,7 +24,6 @@ figma.parameters.on('input', ({ query, key, result }: ParameterInputEvent) => {
 	}
 });
 figma.on('run', ({ parameters }: RunEvent) => {
-	0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.');
 	const origX = figma.currentPage.selection.map((e) => e.x).reduce((e, t) => Math.min(e, t)),
 		origY = figma.currentPage.selection.map((e) => e.y).reduce((e, t) => Math.min(e, t)),
 		format = (e) => {
@@ -69,9 +68,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			const r = figma.currentPage.selection,
 				n = r.filter((e) => e.parent),
 				l = [],
-				o = [],
-				i = n[0].x,
-				g = n[0].y;
+				o = [];
 			((e, t) => {
 				let r = [],
 					n = [];
@@ -102,16 +99,16 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					figma.currentPage.appendChild(e);
 				}),
 				(() => {
-					for (let e = 0; e < l.length; e++) for (let t = 0; t < r.length; t++) (r[t].x = l[e] + i), e++;
-					for (let e = 0; e < o.length; e++) for (let t = 0; t < r.length; t++) (r[t].y = o[e] + g), e++;
+					for (let e = 0; e < l.length; e++) for (let t = 0; t < r.length; t++) (r[t].x = l[e] + origX), e++;
+					for (let e = 0; e < o.length; e++) for (let t = 0; t < r.length; t++) (r[t].y = o[e] + origY), e++;
 				})(),
 				a.remove();
 		};
 	figma.currentPage.selection.map((e) => {
-		'COMPONENT_SET' === e.parent.type
-			? figma.closePlugin("You can't rearrange elements in component sets.")
-			: 1 === parameters.columns
-			? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
-			: (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
+		0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.'),
+			'COMPONENT_SET' === e.parent.type && figma.closePlugin("You can't rearrange elements in component sets."),
+			1 === parseInt(parameters.columns)
+				? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
+				: (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
 	});
 });
