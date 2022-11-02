@@ -104,11 +104,14 @@ figma.on('run', ({ parameters }: RunEvent) => {
 				})(),
 				a.remove();
 		};
+	0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.');
 	figma.currentPage.selection.map((e) => {
-		0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.'),
-			'COMPONENT_SET' === e.parent.type && figma.closePlugin("You can't rearrange elements in component sets."),
-			1 === parseInt(parameters.columns)
-				? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
-				: (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
+		if ('COMPONENT_SET' === e.parent.type) {
+			figma.currentPage.selection = [];
+			figma.closePlugin("You can't rearrange elements in component sets.");
+		}
 	});
+	1 === parseInt(parameters.columns)
+		? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
+		: (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
 });
