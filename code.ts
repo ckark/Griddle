@@ -27,7 +27,7 @@ figma.on('run', ({ parameters }: RunEvent) => {
 	const origX = figma.currentPage.selection.map((e) => e.x).reduce((e, t) => Math.min(e, t)),
 		origY = figma.currentPage.selection.map((e) => e.y).reduce((e, t) => Math.min(e, t)),
 		format = (e) => {
-			(e.counterAxisSizingMode = 'AUTO'), (e.clipsContent = !1), (e.itemSpacing = parseInt(parameters.gap)), (e.backgrounds = []), (e.itemReverseZIndex = !0);
+			(e.primaryAxisSizingMode = 'AUTO'), (e.counterAxisSizingMode = 'AUTO'), (e.clipsContent = !1), (e.itemSpacing = parseInt(parameters.gap)), (e.backgrounds = []), (e.itemReverseZIndex = !0);
 		},
 		grid = (e, t) => {
 			let a = [],
@@ -66,7 +66,6 @@ figma.on('run', ({ parameters }: RunEvent) => {
 		singleRow = (e, t) => {
 			let a = figma.createFrame();
 			const r = figma.currentPage.selection,
-				n = r.filter((e) => e.parent),
 				l = [],
 				o = [];
 			((e, t) => {
