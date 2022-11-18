@@ -12,5 +12,8 @@
 		"@figma/plugin-typings": "*",
 		"prettier": "*",
 		"typescript": "*"
+	},
+	"dependencies": {
+		"terser": "^5.15.1"
 	}
 }
