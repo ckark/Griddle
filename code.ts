@@ -55,53 +55,13 @@ figma.on('run', ({ parameters }: RunEvent) => {
 				n.map((e) => e.appendChild(l));
 			let o = [];
 			const i = [...figma.currentPage.selection];
-			i.map((e) => o.push(e.parent)), i.map((e) => figma.currentPage.appendChild(e));
+			i.map((e) => o.push(e.parent)), i.map((e) => l.parent.appendChild(e));
 			const g = [],
 				s = [];
 			o.map((e) => s.push(e.y)), i.map((e) => g.push(e.x));
 			for (let e = 0; e < i.length; e++) for (let t = 0; t < g.length; t++) (i[e].x = g[t] + origX), e++;
 			for (let e = 0; e < i.length; e++) for (let t = 0; t < s.length; t++) (i[e].y = s[t] + origY), e++;
 			l.remove();
-		},
-		singleRow = (e, t) => {
-			let a = figma.createFrame();
-			const r = figma.currentPage.selection,
-				l = [],
-				o = [];
-			((e, t) => {
-				let r = [],
-					n = [];
-				if ('Yes' === parameters.sort)
-					for (
-						e = [...figma.currentPage.selection]
-							.sort((e, t) => e.x - t.x)
-							.sort((e, t) => e.y - t.y)
-							.sort((e, t) => e.name.localeCompare(t.name));
-						e.length;
-
-					)
-						r.push(e.splice(0, t));
-				else for (e = [...figma.currentPage.selection].sort((e, t) => e.x - t.x).sort((e, t) => e.y - t.y); e.length; ) r.push(e.splice(0, t));
-				figma.currentPage.selection.map((e) => e.parent),
-					r.map((e) => {
-						(a.layoutMode = 'HORIZONTAL'),
-							format(a),
-							e.map((e) => {
-								a.appendChild(e), n.push(e.parent);
-							});
-					});
-			})(e, t),
-				r.forEach((e) => {
-					l.push(e.x), o.push(e.y);
-				}),
-				r.map((e) => {
-					figma.currentPage.appendChild(e);
-				}),
-				(() => {
-					for (let e = 0; e < l.length; e++) for (let t = 0; t < r.length; t++) (r[t].x = l[e] + origX), e++;
-					for (let e = 0; e < o.length; e++) for (let t = 0; t < r.length; t++) (r[t].y = o[e] + origY), e++;
-				})(),
-				a.remove();
 		};
 	0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.');
 	figma.currentPage.selection.map((e) => {
@@ -110,7 +70,5 @@ figma.on('run', ({ parameters }: RunEvent) => {
 			figma.closePlugin("You can't rearrange elements in component sets.");
 		}
 	});
-	1 === parseInt(parameters.columns)
-		? (singleRow(figma.currentPage.selection, figma.currentPage.selection.length), figma.closePlugin('Selection griddled. 🧇'))
-		: (grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇'));
+	grid(figma.currentPage.selection, parseInt(parameters.columns)), figma.closePlugin('Selection griddled. 🧇');
 });
