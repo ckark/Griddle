@@ -17,7 +17,7 @@ figma.parameters.on('input', ({ query, key, result }) => {
             validateInput(query, result, ['1', '2', '4', '6', '8', '12', '14', '16']);
             break;
         case 'gap':
-            validateInput(query, result, ['4', '6', '8', '12', '14', '16']);
+            validateInput(query, result, ['4', '8', '16', '24', '32', '40', '48', '56']);
             break;
         case 'sort':
             validateInput(query, result, ['No', 'Yes']);
