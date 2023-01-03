@@ -9,11 +9,11 @@
 	"author": "Chris Kark",
 	"license": "MIT",
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.57.1",
+		"@figma/plugin-typings": "*",
 		"prettier": "*",
 		"typescript": "*"
 	},
 	"dependencies": {
-		"terser": "^5.15.1"
+		"terser": "*"
 	}
 }
