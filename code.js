@@ -1,86 +1,86 @@
-const validateInput = (e, r, t) => {
-	if ('' === e) r.setSuggestions(t);
+const validateInput = (e, t, n) => {
+	if ('' === e) t.setSuggestions(n);
 	else if (Number.isFinite(+e))
-		if (+e <= 0) r.setError('Please select at least one element.');
+		if (+e <= 0) t.setError('Please select at least one element.');
 		else {
-			const s = t ? t.filter((s) => s.includes(e) && s !== e) : [];
-			r.setSuggestions([e, ...s]);
+			const o = n ? n.filter((t) => t.includes(e) && t !== e) : [];
+			t.setSuggestions([e, ...o]);
 		}
-	else r.setError('Enter a numeric value.');
+	else t.setError('Enter a numeric value.');
 };
-figma.parameters.on('input', ({ query, key, result }) => {
-	switch (key) {
+figma.parameters.on('input', ({ query: e, key: t, result: n }) => {
+	switch (t) {
 		case 'columns':
-			validateInput(query, result, ['1', '2', '4', '6', '8', '12', '14', '16']);
+			validateInput(e, n, ['1', '2', '4', '6', '8', '12', '14', '16']);
 			break;
 		case 'gap':
-			validateInput(query, result, ['4', '8', '16', '24', '32', '40', '48', '56']);
+			validateInput(e, n, ['4', '8', '16', '24', '32', '40', '48', '56']);
 			break;
 		case 'sort':
-			validateInput(query, result, ['No', 'Ascending', 'Descending']);
+			validateInput(e, n, ['No', 'Ascending', 'Descending']);
 			break;
 		default:
 			return;
 	}
-});
-figma.on('run', ({ parameters }) => {
-	let origX = Number.MAX_SAFE_INTEGER,
-		origY = Number.MAX_SAFE_INTEGER;
-	for (let r of figma.currentPage.selection) (origX = Math.min(origX, r.x)), (origY = Math.min(origY, r.y));
-	const sorted = () => {
-			let e = 0;
-			const o = figma.currentPage.selection.map((o) => {
-				const n = o.parent;
-				return (e = Math.min(e, n.children.indexOf(o))), { node: o, parent: n };
-			});
-			if ('Descending' === parameters.sort) o.sort((e, o) => e.node.name.toLocaleLowerCase().localeCompare(o.node.name.toLocaleLowerCase(), void 0, { numeric: !0 }));
-			else {
-				if ('Ascending' !== parameters.sort) return;
-				o.sort((e, o) => o.node.name.toLocaleLowerCase().localeCompare(e.node.name.toLocaleLowerCase(), void 0, { numeric: !0 }));
-			}
-			const t = o[0].parent;
-			let n = 0;
-			for (let l of o) t.insertChild(e + n, l.node), n++;
-		},
-		format = (e) => {
-			(e.primaryAxisSizingMode = 'AUTO'), (e.counterAxisSizingMode = 'AUTO'), (e.clipsContent = !1), (e.itemSpacing = parseInt(parameters.gap)), (e.backgrounds = []), (e.itemReverseZIndex = !0);
-		},
-		grid = (e, a) => {
-			let r = [],
-				t = [...figma.currentPage.selection].sort((e, r) => e.x - r.x).sort((e, r) => e.y - r.y);
-			if ('No' === parameters.sort) for (e = t; e.length; ) r.push(e.splice(0, a));
-			else if ('Descending' === parameters.sort) for (e = t.sort((e, r) => e.name.localeCompare(r.name)); e.length; ) r.push(e.splice(0, a));
-			else if ('Ascending' === parameters.sort) for (e = t.sort((e, r) => r.name.localeCompare(e.name)); e.length; ) r.push(e.splice(0, a));
-			let o = [];
-			for (let e of figma.currentPage.selection) o.push(e.parent);
-			const l = () => {
-				let e = figma.createFrame();
-				return (e.layoutMode = 'HORIZONTAL'), (e.name = 'Row'), format(e), e;
-			};
-			for (let e of r) {
-				let r = l();
-				for (let o of e) r.appendChild(o), t.push(o.parent);
-				r.layoutMode = 'NONE';
-			}
-			let s = figma.createFrame();
-			(s.layoutMode = 'VERTICAL'), (s.name = 'Grid'), format(s);
-			for (let e of t) s.appendChild(e);
-			for (let e of o) e.appendChild(s);
-			let n = [];
-			const f = [...figma.currentPage.selection];
-			for (let e of f) n.push(e.parent), s.parent.appendChild(e);
-			const p = [],
-				i = [];
-			for (let e of n) i.push(e.y);
-			for (let e of f) p.push(e.x);
-			let m = 0;
-			for (let e of f) (e.x = p[m] + origX), (e.y = i[m] + origY), m++;
-			s.remove(), ('Descending' !== parameters.sort && 'Ascending' !== parameters.sort) || sorted();
+}),
+	figma.on('run', ({ parameters: e }) => {
+		let t = Number.MAX_SAFE_INTEGER,
+			n = Number.MAX_SAFE_INTEGER;
+		for (let e of figma.currentPage.selection) (t = Math.min(t, e.x)), (n = Math.min(n, e.y));
+		const o = (t) => {
+			(t.primaryAxisSizingMode = 'AUTO'), (t.counterAxisSizingMode = 'AUTO'), (t.clipsContent = !1), (t.itemSpacing = parseInt(e.gap)), (t.backgrounds = []), (t.itemReverseZIndex = !0);
 		};
-	0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.'),
-		figma.currentPage.selection.map((e) => {
-			'COMPONENT_SET' === e.parent.type && ((figma.currentPage.selection = []), figma.closePlugin("You can't rearrange elements in component sets."));
-		}),
-		grid(figma.currentPage.selection, parseInt(parameters.columns)),
-		figma.closePlugin('Selection griddled. 🧇');
-});
+		0 === figma.currentPage.selection.length && figma.closePlugin('Please select at least one element.'),
+			figma.currentPage.selection.map((e) => {
+				'COMPONENT_SET' === e.parent.type && ((figma.currentPage.selection = []), figma.closePlugin("You can't rearrange elements in component sets."));
+			}),
+			((r, a) => {
+				let s = [],
+					l = [...figma.currentPage.selection].sort((e, t) => e.x - t.x).sort((e, t) => e.y - t.y);
+				if ('No' === e.sort) for (r = l; r.length; ) s.push(r.splice(0, a));
+				else if ('Descending' === e.sort) for (r = l.sort((e, t) => e.name.localeCompare(t.name)); r.length; ) s.push(r.splice(0, a));
+				else if ('Ascending' === e.sort) for (r = l.sort((e, t) => t.name.localeCompare(e.name)); r.length; ) s.push(r.splice(0, a));
+				let i = [];
+				for (let e of figma.currentPage.selection) i.push(e.parent);
+				const c = () => {
+					let e = figma.createFrame();
+					return (e.layoutMode = 'HORIZONTAL'), (e.name = 'Row'), o(e), e;
+				};
+				for (let e of s) {
+					let t = c();
+					for (let n of e) t.appendChild(n), l.push(n.parent);
+					t.layoutMode = 'NONE';
+				}
+				let m = figma.createFrame();
+				(m.layoutMode = 'VERTICAL'), (m.name = 'Grid'), o(m);
+				for (let e of l) m.appendChild(e);
+				for (let e of i) e.appendChild(m);
+				let f = [];
+				const g = [...figma.currentPage.selection];
+				for (let e of g) f.push(e.parent), m.parent.appendChild(e);
+				const u = [],
+					p = [];
+				for (let e of f) p.push(e.y);
+				for (let e of g) u.push(e.x);
+				let d = 0;
+				for (let e of g) (e.x = u[d] + t), (e.y = p[d] + n), d++;
+				m.remove(),
+					('Descending' !== e.sort && 'Ascending' !== e.sort) ||
+						(() => {
+							let t = 0;
+							const n = figma.currentPage.selection.map((e) => {
+								const n = e.parent;
+								return (t = Math.min(t, n.children.indexOf(e))), { node: e, parent: n };
+							});
+							if ('Descending' === e.sort) n.sort((e, t) => e.node.name.toLocaleLowerCase().localeCompare(t.node.name.toLocaleLowerCase(), void 0, { numeric: !0 }));
+							else {
+								if ('Ascending' !== e.sort) return;
+								n.sort((e, t) => t.node.name.toLocaleLowerCase().localeCompare(e.node.name.toLocaleLowerCase(), void 0, { numeric: !0 }));
+							}
+							const o = n[0].parent;
+							let r = 0;
+							for (let e of n) o.insertChild(t + r, e.node), r++;
+						})();
+			})(figma.currentPage.selection, parseInt(e.columns)),
+			figma.closePlugin('Selection griddled. 🧇');
+	});
