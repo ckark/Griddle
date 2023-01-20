@@ -3,7 +3,7 @@
 	"id": "1129518088088100039",
 	"api": "1.0.0",
 	"main": "code.js",
-	"editorType": ["figma"],
+	"editorType": ["figjam", "figma"],
 	"parameterOnly": true,
 	"parameters": [
 		{
