@@ -29,16 +29,17 @@ figma.on('run', ({ parameters }: RunEvent) => {
 	for (let r of figma.currentPage.selection) (origX = Math.min(origX, r.x)), (origY = Math.min(origY, r.y));
 	const sorted = () => {
 			let e = Number.MAX_SAFE_INTEGER;
-			const o = figma.currentPage.selection[0].parent,
-				n = [];
-			for (let r = 0; r < figma.currentPage.selection.length; r++) {
-				const a = figma.currentPage.selection[r];
-				(e = Math.min(e, o.children.indexOf(a))), n.push({ node: a, parent: o });
-			}
-			'Descending' === parameters.sort
-				? n.sort((e, o) => o.node.name.toLocaleLowerCase().localeCompare(e.node.name.toLocaleLowerCase(), void 0, { numeric: !0 }))
-				: 'Ascending' === parameters.sort && n.sort((e, o) => e.node.name.toLocaleLowerCase().localeCompare(o.node.name.toLocaleLowerCase(), void 0, { numeric: !0 }));
-			for (let r = 0; r < n.length; r++) o.insertChild(e + r, n[r].node);
+			const n = figma.currentPage.selection,
+				r = n[0].parent,
+				t = [];
+			n.map((n) => {
+				(e = Math.min(e, r.children.indexOf(n))), t.push({ node: n, parent: r });
+			}),
+				t.sort(function (e, n) {
+					return e.node.name < n.node.name ? -1 : e.node.name > n.node.name ? 1 : 0;
+				}),
+				'Descending' === parameters.sort && t.reverse(),
+				t.map((n, t) => r.insertChild(e + t, n.node));
 		},
 		format = (e) => {
 			(e.primaryAxisSizingMode = 'AUTO'), (e.counterAxisSizingMode = 'AUTO'), (e.clipsContent = !1), (e.itemSpacing = parseInt(parameters.gap)), (e.backgrounds = []), (e.itemReverseZIndex = !0);
