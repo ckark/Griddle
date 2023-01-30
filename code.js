@@ -34,17 +34,30 @@ figma.on('run', ({ parameters }) => {
         }),
             ((e, t, a, n) => {
                 t = !0 === isNaN(t) ? e.length : parseInt(t);
-                let r = [...figma.currentPage.selection].sort((e, t) => e.x - t.x).sort((e, t) => e.y - t.y);
-                'No' === n ? (e = r) : 'Descending' === n ? (e = r.sort((e, t) => e.name.localeCompare(t.name))) : 'Ascending' === n && (e = r.sort((e, t) => t.name.localeCompare(e.name)));
-                let l = 1 / 0, o = 1 / 0;
+                let o = [...figma.currentPage.selection].sort((e, t) => e.x - t.x).sort((e, t) => e.y - t.y);
+                'No' === n ? (e = o) : 'Descending' === n ? (e = o.sort((e, t) => e.name.localeCompare(t.name))) : 'Ascending' === n && (e = o.sort((e, t) => t.name.localeCompare(e.name)));
+                let r = 1 / 0, s = 1 / 0;
                 for (const t of e)
-                    (l = Math.min(l, t.x)), (o = Math.min(o, t.y));
-                let s = l, c = o, i = 0;
+                    (r = Math.min(r, t.x)), (s = Math.min(s, t.y));
+                let l = r, c = s, m = 0;
                 for (let n = 0; n < e.length; n++) {
-                    const r = e[n].width, o = e[n].height, m = e[n];
-                    (m.x = s), (m.y = c), (i = Math.max(i, o)), (s += r + a), (n + 1) % t == 0 && ((s = l), (c += i + a), (i = 0));
+                    const o = e[n].width, s = e[n].height, i = e[n];
+                    (i.x = l), (i.y = c), (m = Math.max(m, s)), (l += o + a), (n + 1) % t == 0 && ((l = r), (c += m + a), (m = 0));
                 }
             })(figma.currentPage.selection, parameters.columns, parseInt(parameters.gap), parameters.sort),
+            ((e, t) => {
+                const a = e[0].parent, n = [];
+                let o = e.length;
+                for (let t = 0; t < o; t++) {
+                    const o = e[t];
+                    n.push({ node: o, parent: a });
+                }
+                'Descending' === t
+                    ? n.sort((e, t) => t.node.name.toLowerCase().localeCompare(e.node.name.toLowerCase()))
+                    : 'Ascending' === t && n.sort((e, t) => e.node.name.toLowerCase().localeCompare(t.node.name.toLowerCase()));
+                for (let e = 0; e < o; e++)
+                    a.insertChild(e, n[e].node);
+            })(figma.currentPage.selection, parameters.sort),
             console.clear(),
             figma.closePlugin('Selection griddled. 🧇'));
 });
