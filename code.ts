@@ -1,7 +1,7 @@
-const validateInput = (e: string, r: SuggestionResults, t?: string[]) => {
+const v = (e: string, r: SuggestionResults, t?: string[]) => {
 	if ('' === e) r.setSuggestions(t);
 	else if (Number.isFinite(+e))
-		if (+e <= 0) r.setError('Please select at least one element.');
+		if (+e <= 1) r.setError('Please select at least two elements.');
 		else {
 			const s = t ? t.filter((s) => s.includes(e) && s !== e) : [];
 			r.setSuggestions([e, ...s]);
@@ -11,13 +11,13 @@ const validateInput = (e: string, r: SuggestionResults, t?: string[]) => {
 figma.parameters.on('input', ({ query, key, result }: ParameterInputEvent) => {
 	switch (key) {
 		case 'columns':
-			validateInput(query, result, ['Auto', '1', '2', '4', '6', '8', '12', '14', '16']);
+			v(query, result, ['Auto', '1', '2', '4', '6', '8', '12', '14', '16']);
 			break;
 		case 'gap':
-			validateInput(query, result, ['0', '2', '4', '8', '16', '24', '32', '40', '48', '56']);
+			v(query, result, ['0', '2', '4', '8', '16', '24', '32', '40', '48', '56']);
 			break;
 		case 'sort':
-			validateInput(query, result, ['No', 'Ascending', 'Descending']);
+			v(query, result, ['No', 'Ascending', 'Descending']);
 			break;
 		default:
 			return;
