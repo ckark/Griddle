@@ -24,6 +24,7 @@ figma.parameters.on('input', ({ query, key, result }: ParameterInputEvent) => {
 	}
 });
 figma.on('run', ({ parameters }: RunEvent) => {
+	const e = Date.now();
 	1 >= figma.currentPage.selection.length
 		? figma.closePlugin('Please select at least two elements.')
 		: (figma.currentPage.selection.map((e) => {
@@ -58,7 +59,8 @@ figma.on('run', ({ parameters }: RunEvent) => {
 					? n.sort((e, t) => t.node.name.toLowerCase().localeCompare(e.node.name.toLowerCase()))
 					: 'Ascending' === t && n.sort((e, t) => e.node.name.toLowerCase().localeCompare(t.node.name.toLowerCase()));
 				for (let e = 0; e < o; e++) a.insertChild(e, n[e].node);
-		  })(figma.currentPage.selection, parameters.sort),
-		  console.clear(),
-		  figma.closePlugin('Selection griddled. 🧇'));
+		  })(figma.currentPage.selection, parameters.sort));
+	console.clear();
+	const t = (Date.now() - e) / 1e3;
+	figma.closePlugin(`Selection griddled 🧇 in ${t} seconds.`);
 });
