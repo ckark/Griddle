@@ -60,6 +60,6 @@ figma.on('run', ({ parameters }) => {
                     a.insertChild(e, n[e].node);
             })(figma.currentPage.selection, parameters.sort));
     console.clear();
-    const t = (Date.now() - e) / 1e3;
-    figma.closePlugin(`Selection griddled 🧇 in ${t} seconds.`);
+    const t = (Date.now() - e) / 1e3, c = figma.currentPage.selection.length;
+    figma.closePlugin(`Griddled 🧇 ${c} items in ${t} seconds.`);
 });
