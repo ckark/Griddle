@@ -2,7 +2,7 @@ const v = (e, r, t) => {
     if ('' === e)
         r.setSuggestions(t);
     else if (Number.isFinite(+e))
-        if (+e <= 1)
+        if (+e < 1)
             r.setError('Please select at least two elements.');
         else {
             const s = t ? t.filter((s) => s.includes(e) && s !== e) : [];
