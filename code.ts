@@ -1,30 +1,30 @@
-const e = (e: any, t: any, n: any) => {
-	'' === e
-		? t.setSuggestions(n)
-		: Number.isFinite(+e)
-		? +e < 1
-			? t.setError('Please select at least two elements.')
-			: t.setSuggestions([e, ...(n ? n.filter((t: any) => t.includes(e) && t !== e) : [])])
-		: t.setError('Enter a numeric value.');
+const handleInput = (input: any, result: any, suggestions: any) => {
+	'' === input
+		? result.setSuggestions(suggestions)
+		: Number.isFinite(+input)
+		? +input < 1
+			? result.setError('Please select at least two elements.')
+			: result.setSuggestions([input, ...(suggestions ? suggestions.filter((suggestion: any) => suggestion.includes(input) && suggestion !== input) : [])])
+		: result.setError('Enter a numeric value.');
 };
 
-figma.parameters.on('input', ({ query: t, key: n, result: a }) => {
-	switch (n) {
+figma.parameters.on('input', ({ query: input, key: parameterKey, result: result }) => {
+	switch (parameterKey) {
 		case 'columns':
-			e(t, a, ['Auto', '1', '2', '4', '6', '8', '12', '14', '16']);
+			handleInput(input, result, ['Auto', '1', '2', '4', '6', '8', '12', '14', '16']);
 			break;
 		case 'gap':
-			e(t, a, ['0', '2', '4', '8', '16', '24', '32', '40', '48', '56']);
+			handleInput(input, result, ['0', '2', '4', '8', '16', '24', '32', '40', '48', '56']);
 			break;
 		case 'sort':
-			e(t, a, ['No', 'Ascending', 'Descending']);
+			handleInput(input, result, ['No', 'Ascending', 'Descending']);
 			break;
 		default:
 			return;
 	}
 });
 
-figma.on('run', async ({ parameters: e }) => {
+figma.on('run', async ({ parameters: params }) => {
 	if ((await figma.loadAllPagesAsync(), 0 === figma.currentPage.selection.length)) {
 		figma.notify('Select at least one item.');
 		figma.closePlugin();
@@ -32,54 +32,54 @@ figma.on('run', async ({ parameters: e }) => {
 	}
 
 	try {
-		const t = Date.now();
+		const startTime = Date.now();
 		figma.currentPage.selection.length <= 1
 			? figma.closePlugin('Please select at least two elements.')
-			: (figma.currentPage.selection.map((e) => ('FRAME' === e.parent.type || 'COMPONENT_SET' === e.parent.type ? (e.parent.layoutMode = 'NONE') : null)),
-			  ((e, t, n, a) => {
-					t = isNaN(t) ? e.length : parseInt(t);
-					let o = [...figma.currentPage.selection].sort((e, t) => e.x - t.x).sort((e, t) => e.y - t.y);
+			: (figma.currentPage.selection.map((node) => ('FRAME' === node.parent.type || 'COMPONENT_SET' === node.parent.type ? (node.parent.layoutMode = 'NONE') : null)),
+			  ((selection, columns, gap, sortOrder) => {
+					columns = isNaN(columns) ? selection.length : parseInt(columns);
+					let sortedSelection = [...figma.currentPage.selection].sort((a, b) => a.x - b.x).sort((a, b) => a.y - b.y);
 
-					o =
-						a === 'Descending'
-							? o.sort((e, t) => e.name.toLowerCase().localeCompare(t.name.toLowerCase()))
-							: a === 'Ascending'
-							? o.sort((e, t) => t.name.toLowerCase().localeCompare(e.name.toLowerCase()))
-							: o;
+					sortedSelection =
+						sortOrder === 'Descending'
+							? sortedSelection.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()))
+							: sortOrder === 'Ascending'
+							? sortedSelection.sort((a, b) => b.name.toLowerCase().localeCompare(a.name.toLowerCase()))
+							: sortedSelection;
 
-					let r = Infinity,
-						s = Infinity;
-					for (const t of o) {
-						r = Math.min(r, t.x);
-						s = Math.min(s, t.y);
+					let minX = Infinity,
+						minY = Infinity;
+					for (const node of sortedSelection) {
+						minX = Math.min(minX, node.x);
+						minY = Math.min(minY, node.y);
 					}
-					let l = r,
-						c = s,
-						i = 0;
-					for (let a = 0; a < o.length; a++) {
-						const currentNode = o[a];
-						(currentNode.x = l), (currentNode.y = c), (i = Math.max(i, currentNode.height));
-						l += currentNode.width + n;
-						(a + 1) % t == 0 && ((l = r), (c += i + n), (i = 0));
+					let currentX = minX,
+						currentY = minY,
+						maxHeight = 0;
+					for (let i = 0; i < sortedSelection.length; i++) {
+						const currentNode = sortedSelection[i];
+						(currentNode.x = currentX), (currentNode.y = currentY), (maxHeight = Math.max(maxHeight, currentNode.height));
+						currentX += currentNode.width + gap;
+						(i + 1) % columns == 0 && ((currentX = minX), (currentY += maxHeight + gap), (maxHeight = 0));
 					}
-			  })(figma.currentPage.selection, e.columns, parseInt(e.gap), e.sort),
-			  ((e, t) => {
-					const n = e[0].parent,
-						a = e.map((o) => ({ node: o, parent: n }));
+				})(figma.currentPage.selection, params.columns, parseInt(params.gap), params.sort),
+					((selection, sortOrder) => {
+						const parent = selection[0].parent,
+							nodesWithParent = selection.map((node) => ({ node, parent }));
 
-					t === 'Descending'
-						? a.sort((e, t) => t.node.name.toLowerCase().localeCompare(e.node.name.toLowerCase()))
-						: t === 'Ascending'
-						? a.sort((e, t) => e.node.name.toLowerCase().localeCompare(t.node.name.toLowerCase()))
-						: null;
+						sortOrder === 'Descending'
+							? nodesWithParent.sort((a, b) => b.node.name.toLowerCase().localeCompare(a.node.name.toLowerCase()))
+							: sortOrder === 'Ascending'
+							? nodesWithParent.sort((a, b) => a.node.name.toLowerCase().localeCompare(b.node.name.toLowerCase()))
+							: null;
 
-					a.forEach((item, index) => n.insertChild(index, item.node));
-			  })(figma.currentPage.selection, e.sort));
+						nodesWithParent.forEach((item, index) => parent.insertChild(index, item.node));
+					})(figma.currentPage.selection, params.sort););
 
 		console.clear();
-		const n = (Date.now() - t) / 1e3,
-			a = figma.currentPage.selection.length;
-		figma.closePlugin(`Griddled 🧇 ${a} items in ${n} seconds.`);
+		const duration = (Date.now() - startTime) / 1e3,
+			itemCount = figma.currentPage.selection.length;
+		figma.closePlugin(`Griddled 🧇 ${itemCount} items in ${duration} seconds.`);
 	} catch (error) {
 		console.error(error);
 		figma.closePlugin('An error occurred.');
